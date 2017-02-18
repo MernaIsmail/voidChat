@@ -183,7 +183,7 @@ public class ClientView extends Application implements ClientViewInt {
      */
     @Override
     public void showSuccess(String title, String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(header);
         alert.setContentText(content);
@@ -230,8 +230,8 @@ public class ClientView extends Application implements ClientViewInt {
     }
 
     @Override
-    public String getSaveLocation(String sender) {
-        return chatSceneController.getSaveLocation(sender);
+    public String getSaveLocation(String sender,String filename) {
+        return chatSceneController.getSaveLocation(sender,filename);
     }
     
 
@@ -251,7 +251,8 @@ public class ClientView extends Application implements ClientViewInt {
     }
     
     @Override
-    public void errorServer() {
+
+    public void loadErrorServer() {
        chatSceneController.loadErrorServer();
     }
 
@@ -264,6 +265,12 @@ public class ClientView extends Application implements ClientViewInt {
     public boolean sendMail(String to, String emailBody) {
         return controller.sendMail(to, emailBody);
     }
+
+    @Override
+    public boolean conncetToServer(String host) {
+        return controller.conncetToServer(host);
+    }
+
 
     @Override
     public String getGender(String username) {

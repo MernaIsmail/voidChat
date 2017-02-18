@@ -52,7 +52,9 @@ public class ServerView extends Application implements ServerViewInt {
         stage.show();
         stage.setResizable(false);
         stage.setOnCloseRequest((WindowEvent ew) -> {
+            controller.loadErrorServer();
             Platform.exit();
+            controller.loadErrorServer();
             //TODO : why not close
             System.exit(0);
         });
@@ -101,6 +103,11 @@ public class ServerView extends Application implements ServerViewInt {
         }
     }
 
+
+    @Override
+    public void loadErrorServer() {
+        controller.loadErrorServer();
+    }
     public ArrayList<Integer> getStatistics() {
         return controller.getStatistics();
     }

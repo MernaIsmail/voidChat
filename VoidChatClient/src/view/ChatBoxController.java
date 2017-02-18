@@ -162,7 +162,7 @@ public class ChatBoxController implements Initializable {
             //Show save file dialog
             File file = fileChooser.showSaveDialog(st);
 
-            if (file != null && !file.isFile()) {
+            if (file != null) {
                 ArrayList<Message> history = clientView.getHistory(receiver);
                 clientView.saveXMLFile(file, history);
             }
@@ -185,10 +185,6 @@ public class ChatBoxController implements Initializable {
             return;
         }
 
-        String[] split = file.getName().split("\\.(?=[^\\.]+$)");
-
-        String extension = "." + split[1];
-
         //  make connection with peer client 
         ClientModelInt peer = clientView.getConnection(receiver);
 
@@ -203,7 +199,7 @@ public class ChatBoxController implements Initializable {
                 FileInputStream in = null;
 
                 //get path to save file on other user
-                String path = peer.getSaveLocation(clientView.getUserInformation().getUsername());
+                String path = peer.getSaveLocation(clientView.getUserInformation().getUsername() ,file.getName());
                 //other client refuse file transfare
                 if (path == null) {
 
@@ -214,15 +210,15 @@ public class ChatBoxController implements Initializable {
                 }
 
                 System.out.println(path);
-
                 in = new FileInputStream(file);
                 byte[] data = new byte[1024 * 1024];
                 int dataLength = in.read(data);
-
+                boolean append = false ;
                 while (dataLength > 0) {
                     System.out.println("Send : " + dataLength);
-                    peer.reciveFile(path, extension, data, dataLength);
+                    peer.reciveFile(path, file.getName(),append, data, dataLength);
                     dataLength = in.read(data);
+                    append = true ; 
                 }
 
             } catch (RemoteException ex) {
@@ -274,9 +270,9 @@ public class ChatBoxController implements Initializable {
             
             ImageView img;
             if(clientView.getUserInformation().getGender().equals("Female"))
-                img = new ImageView(new Image(getClass().getResource("..//resouces//female_32.png").openStream()));
+                img = new ImageView(new Image(getClass().getResource("/resouces/female_32.png").openStream()));
             else
-                img = new ImageView(new Image(getClass().getResource("..//resouces//user_32.png").openStream()));
+                img = new ImageView(new Image(getClass().getResource("/resouces/user_32.png").openStream()));
 
             Label sendLabel = new Label(txtFieldMsg.getText());
             sendLabel.setMaxWidth(300);
@@ -344,9 +340,9 @@ public class ChatBoxController implements Initializable {
            ImageView img;
             //check here ,, need method get receiver object to know type ..
            if(clientView.getGender(receiver).equals("Female"))
-                img = new ImageView(new Image(getClass().getResource("..//resouces//female_32.png").openStream()));
+                img = new ImageView(new Image(getClass().getResource("/resouces/female_32.png").openStream()));
             else
-                img = new ImageView(new Image(getClass().getResource("..//resouces//user_32.png").openStream()));
+                img = new ImageView(new Image(getClass().getResource("/resouces/user_32.png").openStream()));
 
             Text recName = new Text(message.getFrom());
             recName.setStyle("-fx-font: 10 arial;");
@@ -462,7 +458,7 @@ public class ChatBoxController implements Initializable {
                 try {
                     HBox cell = new HBox();
 
-                    ImageView img = new ImageView(new Image(getClass().getResource("..//resouces//user_32.png").openStream()));
+                    ImageView img = new ImageView(new Image(getClass().getResource("/resouces/user_32.png").openStream()));
 
                     Label sendLabel = new Label(message.getBody());
                     sendLabel.setMaxWidth(300);
@@ -499,7 +495,7 @@ public class ChatBoxController implements Initializable {
                     HBox cell = new HBox();
                     VBox vbox = new VBox();
 
-                    ImageView img = new ImageView(new Image(getClass().getResource("..//resouces//user_32.png").openStream()));
+                    ImageView img = new ImageView(new Image(getClass().getResource("/resouces/user_32.png").openStream()));
 
                     Label recLabel = new Label(message.getBody());
                     recLabel.setMaxWidth(300);

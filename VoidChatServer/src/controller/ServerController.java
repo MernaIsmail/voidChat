@@ -23,7 +23,7 @@ import view.ServerView;
 public class ServerController implements ServerControllerInt {
 
     private HashMap<String, ClientModelInt> onlineUsers = new HashMap<>();
-    private HashMap<String, ArrayList<String>> groups = new HashMap<String, ArrayList<String>>();
+    private HashMap<String, ArrayList<String>> groups = new HashMap<>();
 
     private ServerModel model;
     private ServerView view;
@@ -34,6 +34,8 @@ public class ServerController implements ServerControllerInt {
 
     private byte[] sponserImage;
     private String serverNotifaction;
+    
+    private Thread checkOnline ;
 
     public ServerController(ServerView view) {
         try {
@@ -60,16 +62,26 @@ public class ServerController implements ServerControllerInt {
         System.out.println("Server controller");
         try {
             reg.rebind("voidChatServer", model);
-
+            
+            //method to check online users 
+            checkOnline = new Thread(()->{
+                while(true)
+                    checkOnlines();
+            });
+            checkOnline.start();
+            //set all user offline 
+            model.setAllUserOffline();
         } catch (RemoteException ex) {
             ex.printStackTrace();
         }
     }
 
+    @Override
     public void stopServer() {
         try {
             System.out.println("Server controller stop server");
             reg.unbind("voidChatServer");
+            checkOnline.stop();
         } catch (RemoteException ex) {
             ex.printStackTrace();
         } catch (NotBoundException ex) {
@@ -299,5 +311,51 @@ public class ServerController implements ServerControllerInt {
     //-------------- Roma ------------------
     //-------------- End roma ------------------
     //-------------- Motyim ------------------
+    
+    //method to check online users and remove not active user
+     private void checkOnlines(){
+        try {
+            
+            Thread.sleep(5000);
+            Set<String> onlineSet = onlineUsers.keySet();
+            onlineSet.forEach((user) -> {
+                try {
+                    //user is not online
+                    onlineUsers.get(user).isOnline();
+                } catch (RemoteException ex) {
+                    try {
+                        ex.printStackTrace();
+                        //handle set user offline
+                        model.changeStatus(user , "offline");
+                        //remove user from hashmap
+                        onlineUsers.remove(user);
+                        
+                    } catch (RemoteException ex1) {
+                        Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    
+                }
+            });
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ServerController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+     }
+
     //-------------- End motyim ------------------
+
+    @Override
+    public void loadErrorServer() {
+        for(String key : onlineUsers.keySet()){
+             ClientModelInt clientObject=onlineUsers.get(key);
+             try {
+                    clientObject.loadErrorServer();
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
 }

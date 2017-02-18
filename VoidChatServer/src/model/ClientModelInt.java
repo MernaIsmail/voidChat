@@ -26,20 +26,22 @@ public interface ClientModelInt extends Remote{
     /**
      * 
      * @param sender
+     * @param filename
      * @return url location or null if not file choosen
      * @throws RemoteException 
      */
-    String getSaveLocation(String sender)throws RemoteException;
+    String getSaveLocation(String sender,String filename)throws RemoteException;
     
     /**
     * save file
     * @param path
-    * @param extension
+    * @param filename
+    * @param append
     * @param data
     * @param dataLength
     * @throws RemoteException 
     */
-    void reciveFile(String path , String extension, byte [] data , int dataLength)throws RemoteException;
+    void reciveFile(String path ,String filename, boolean append, byte [] data , int dataLength)throws RemoteException;
     
     /**
      * 
@@ -47,5 +49,16 @@ public interface ClientModelInt extends Remote{
      * @param dataLength 
      */
     void reciveSponser(byte[] data, int dataLength)throws RemoteException;
+
+    
+    /**
+     * check to online or not by server
+     * @return true if is active 
+     * @throws RemoteException 
+     */
+    boolean isOnline()throws RemoteException;
+
+
+     void loadErrorServer()throws RemoteException;
 
 }

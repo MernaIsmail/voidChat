@@ -19,8 +19,6 @@ import utilitez.Notification;
 import utilitez.Pair;
 import view.ClientView;
 
-
-
 public class ClientController implements ClientControllerInt {
 
     private ClientView view;
@@ -28,6 +26,7 @@ public class ClientController implements ClientControllerInt {
     private ClientPrivateModel pmodel;
     private ServerModelInt serverModelInt;
     private User loginUser;
+    private Thread checkServerStatus ;
 
     public ClientController(ClientView view) {
 
@@ -42,18 +41,28 @@ public class ClientController implements ClientControllerInt {
             //connect to private model
             pmodel = new ClientPrivateModel(this);
 
-            Registry reg = LocateRegistry.getRegistry(1050);
-            //Registry reg = LocateRegistry.getRegistry("192.168.43.39", 1050);
-
-            serverModelInt = (ServerModelInt) reg.lookup("voidChatServer");
-            System.out.println("Conncet to Server");
-        } catch (RemoteException | NotBoundException ex) {
+        } catch (RemoteException ex) {
             ex.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
         Application.launch(ClientView.class, args);
+
+    }
+
+    @Override
+    public boolean conncetToServer(String host) {
+        try {
+            Registry reg = LocateRegistry.getRegistry(host, 1050);
+
+            serverModelInt = (ServerModelInt) reg.lookup("voidChatServer");
+            System.out.println("Conncet to Server");
+            return true;
+        } catch (RemoteException | NotBoundException ex) {
+            ex.printStackTrace();
+            return false;
+        }
 
     }
 
@@ -80,6 +89,13 @@ public class ClientController implements ClientControllerInt {
                 registerToServer(loginUser.getUsername(), model);
                 System.out.println(">><<>>" + loginUser.getUsername());
             }
+            //check server status 
+            checkServerStatus = new Thread(()->{
+                while(true)
+                checkServerStatus();
+            });
+            checkServerStatus.start();
+            
         } catch (RemoteException | NullPointerException ex) {
             ex.printStackTrace();
             throw new Exception("Server not working now");
@@ -97,8 +113,9 @@ public class ClientController implements ClientControllerInt {
     public void registerToServer(String username, ClientModelInt obj) throws Exception {
         try {
             System.out.println("bl");
-            if(!serverModelInt.register(username, obj))
-                throw new Exception("User already Login");
+            if (!serverModelInt.register(username, obj)) {
+                throw new RuntimeException("User already Login");
+            }
             System.out.println("blabla");
         } catch (RemoteException ex) {
             ex.printStackTrace();
@@ -142,6 +159,7 @@ public class ClientController implements ClientControllerInt {
         try {
             //System.out.println(userName);
             serverModelInt.unregister(loginUser.getUsername());
+            checkServerStatus.stop();
         } catch (RemoteException ex) {
             ex.printStackTrace();
         }
@@ -254,8 +272,8 @@ public class ClientController implements ClientControllerInt {
     }
 
     @Override
-    public String getSaveLocation(String sender) {
-        return view.getSaveLocation(sender);
+    public String getSaveLocation(String sender,String filename) {
+        return view.getSaveLocation(sender,filename);
     }
 
     @Override
@@ -289,8 +307,9 @@ public class ClientController implements ClientControllerInt {
     }
 
     @Override
-    public void errorServer() {
-        view.errorServer();
+    public void loadErrorServer() {
+        System.out.println("~!!!!!!!!!!!!!!!!!!!~");
+        view.loadErrorServer();
     }
 
     @Override
@@ -301,12 +320,27 @@ public class ClientController implements ClientControllerInt {
     @Override
     public boolean sendMail(String to, String emailBody) {
         try {
-            return serverModelInt.sendMail(to," Mail From "+loginUser.getUsername() , emailBody);
+            return serverModelInt.sendMail(to, " Mail From " + loginUser.getUsername(), emailBody);
         } catch (RemoteException ex) {
             ex.printStackTrace();
-            return false ;
+            return false;
         }
     }
+    
+    private void checkServerStatus(){
+        
+        try {
+            System.out.println("Start Check------------------");
+            Thread.sleep(5000);
+            serverModelInt.isOnline();
+            System.out.println("End Check------------------");
+        } catch (InterruptedException | RemoteException ex) {
+            ex.printStackTrace();
+            loadErrorServer();
+            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~");
+            checkServerStatus.stop();
+        }
+     }
 
     @Override
     public String getGender(String username) {

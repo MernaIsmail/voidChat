@@ -9,6 +9,13 @@ import model.User;
 import utilitez.Pair;
 
 public interface ClientControllerInt {
+    
+    /**
+     * connect to server by host ip
+     * @param host
+     * @return 
+     */
+    public boolean conncetToServer(String host);
 
     /**
      * validate & create user obj send to server Model
@@ -128,10 +135,11 @@ public interface ClientControllerInt {
 
     /**
      *
+     * @param sender
+     * @param filename
      * @return url location or null if not file choosen
-     * @throws RemoteException
      */
-    String getSaveLocation(String sender);
+    String getSaveLocation(String sender,String filename);
     
 
 
@@ -141,7 +149,7 @@ public interface ClientControllerInt {
     public ArrayList<Message> getHistory(String receiver);
     
     ArrayList<Pair> getContactsWithType();
-    void errorServer();
+    void loadErrorServer();
     
     void reciveSponser(byte[] data, int dataLength);
     

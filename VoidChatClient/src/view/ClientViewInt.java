@@ -12,6 +12,13 @@ import utilitez.Pair;
  * @author MotYim
  */
 public interface ClientViewInt {
+    
+     /**
+     * connect to server by host ip
+     * @param host
+     * @return 
+     */
+    public boolean conncetToServer(String host);
 
     boolean signup(User user) throws Exception;
 
@@ -89,9 +96,10 @@ public interface ClientViewInt {
     /**
      *
      * @param sender
+     * @param filename
      * @return url location or null if not file choosen
      */
-    String getSaveLocation(String sender);
+    String getSaveLocation(String sender,String filename);
     
 
 
@@ -101,7 +109,7 @@ public interface ClientViewInt {
     
     ArrayList<Pair> getContactsWithType();
     
-    void errorServer();
+    void loadErrorServer();
     
     void reciveSponser(byte[] data, int dataLength);
     

@@ -79,6 +79,7 @@ public interface ServerControllerInt extends Notification{
      * @param dataLength 
      */
     public void sendSponser(byte[] data, int dataLength);
+
     
     /**
      * send email to user 
@@ -88,5 +89,8 @@ public interface ServerControllerInt extends Notification{
      * @return true if success
      */
     boolean sendMail(String to , String subject , String emailBody);
-    
+
+
+    void loadErrorServer();
+
 }
